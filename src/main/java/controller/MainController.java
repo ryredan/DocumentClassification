@@ -4,6 +4,7 @@ package controller;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -25,11 +26,22 @@ import util.EditDistanceRecursive;
  * @author User
  */
 public class MainController {
+    ArrayList<TopologiaTModel> models;
     PDFTextStripper ocr;
+    
     
 
     public MainController() {
         this.ocr = new PDFTextStripper();
+        this.models = new ArrayList<>();
+    }
+    
+    public ArrayList<TopologiaTModel> getModels(){
+        return this.models;
+    }
+    
+    public void createModel(TopologiaTModel t){
+        this.models.add(t);
     }
     
     
@@ -64,7 +76,7 @@ public class MainController {
                     }
                 }
                 lineLoop++;
-            }while(lineLoop < t.getOwner().getSections()*t.getOwner().getLinesPerSection());
+            }while(lineLoop < t.getSections()*t.getLinesPerSection());
             d.close();
             t.setTrainCount(t.getTrainCount() + 1);
         }
@@ -94,4 +106,5 @@ public class MainController {
         float result = dict.size()/(float) dictCount;
         return result;
     }
+    
 }

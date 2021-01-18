@@ -13,24 +13,44 @@ import java.util.List;
  * @author User
  */
 public class TopologiaTModel {
-    Topologia owner;
     int trainCount;
     List<List> trainData = new ArrayList<>();
+    String name;
+    int sections;
+    int linesPerSection;
 
-    public TopologiaTModel(Topologia t) {
-        this.owner = t;
+    public TopologiaTModel(String name, int sections, int linesPerSection) {
+        this.name = name;
+        this.sections = sections;
+        this.linesPerSection = linesPerSection;
         this.trainCount = 0;
-        for(int i = 0; i < t.getSections()*t.linesPerSection; i++){
+        for(int i = 0; i < sections*linesPerSection; i++){
             trainData.add(new ArrayList<WordEntry>());
         }
     }
-
-    public Topologia getOwner() {
-        return owner;
+        
+    public String getName() {
+        return name;
     }
 
-    public void setOwner(Topologia owner) {
-        this.owner = owner;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getSections() {
+        return sections;
+    }
+
+    public void setSections(int sections) {
+        this.sections = sections;
+    }
+
+    public int getLinesPerSection() {
+        return linesPerSection;
+    }
+
+    public void setLinesPerSection(int linesPerSection) {
+        this.linesPerSection = linesPerSection;
     }
 
     public int getTrainCount() {
@@ -49,4 +69,7 @@ public class TopologiaTModel {
         this.trainData = trainData;
     }
     
+    public String toString(){
+        return name;
+    }
 }

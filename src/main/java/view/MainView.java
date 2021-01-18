@@ -6,13 +6,17 @@
 package view;
 
 import controller.MainController;
+import java.awt.Component;
 import java.io.File;
 import java.io.FilenameFilter;
+import javax.swing.CellRendererPane;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
-import model.Topologia;
+import javax.swing.ListCellRenderer;
+import model.TopologiaComboBoxModel;
 import model.TopologiaTModel;
 
 /**
@@ -20,12 +24,11 @@ import model.TopologiaTModel;
  * @author User
  */
 public class MainView extends javax.swing.JFrame {
-    Topologia rde1;
-    TopologiaTModel model1;
     File[] trainFiles;
     File[] testFiles;
     
     MainController mc = new MainController();
+    TopologiaComboBoxModel tcm;
     
     
     /**
@@ -34,11 +37,10 @@ public class MainView extends javax.swing.JFrame {
     
     public MainView() {
         initComponents();
-        rde1 = new Topologia("Teste");
-        rde1.setSections(4);
-        rde1.setLinesPerSection(10);
-        model1 = new TopologiaTModel(rde1);
+        tcm = new TopologiaComboBoxModel(mc.getModels());
+        jComboBox1.setModel(tcm);
         jFileChooser1.setMultiSelectionEnabled(true);
+        mc.createModel(new TopologiaTModel("Teste", 4, 10));
     }
 
     /**
@@ -61,6 +63,9 @@ public class MainView extends javax.swing.JFrame {
         jList1 = new javax.swing.JList<>();
         jBTreinar = new javax.swing.JButton();
         jBTeste = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jButton1 = new javax.swing.JButton();
 
         jFileChooser1.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
 
@@ -102,37 +107,57 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setText("Modelo:");
+
+        jButton1.setText("Novo");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel2)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jLabel1)
-                                .addComponent(jTextTreino, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-                                .addComponent(jTextTeste))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jTextTeste, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jTextTreino, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jBAbrirTeste)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jBTeste, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jBAbrirTreino)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jBTreinar))))
-                        .addComponent(jLabel2)))
+                            .addComponent(jBAbrirTreino)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jBTreinar))
+                        .addComponent(jLabel3)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addGap(275, 275, 275)
+                                .addComponent(jBAbrirTeste)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jBTeste, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(jLabel1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel3)
+                .addGap(4, 4, 4)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -147,7 +172,7 @@ public class MainView extends javax.swing.JFrame {
                     .addComponent(jBAbrirTeste)
                     .addComponent(jBTeste))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -195,19 +220,28 @@ public class MainView extends javax.swing.JFrame {
 
     private void jBTreinarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTreinarActionPerformed
         JDialog jd = new JDialog(this, "Treinando");
+        JPanel jp = new JPanel();
         JLabel j1 = new JLabel("Aguarde...");
-        jd.add(j1);
-        mc.trainModel(trainFiles, model1, 3);
+        jd.add(jp);
+        jp.add(j1);
+        jd.setSize(100, 100);
+        jd.setVisible(true);
+        mc.trainModel(trainFiles, (TopologiaTModel) jComboBox1.getSelectedItem(), 3);
         jd.dispose();
     }//GEN-LAST:event_jBTreinarActionPerformed
 
     private void jBTesteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTesteActionPerformed
         DefaultListModel dlm = new DefaultListModel();
         for(File t : testFiles){
-            dlm.add(dlm.size(), t.getName() + ": " + mc.classifyDocument(t, model1)*100 + "%");
+            dlm.add(dlm.size(), t.getName() + ": " + mc.classifyDocument(t, (TopologiaTModel) jComboBox1.getSelectedItem())*100 + "%");
         }
         jList1.setModel(dlm);
     }//GEN-LAST:event_jBTesteActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        NewModelView window = new NewModelView(this, true, mc);
+        window.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -249,9 +283,12 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JButton jBAbrirTreino;
     private javax.swing.JButton jBTeste;
     private javax.swing.JButton jBTreinar;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JComboBox<Object> jComboBox1;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextTeste;

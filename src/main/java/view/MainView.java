@@ -6,16 +6,13 @@
 package view;
 
 import controller.MainController;
-import java.awt.Component;
 import java.io.File;
 import java.io.FilenameFilter;
-import javax.swing.CellRendererPane;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
+import model.ClassificationResult;
 import model.TopologiaComboBoxModel;
 import model.TopologiaTModel;
 
@@ -40,7 +37,6 @@ public class MainView extends javax.swing.JFrame {
         tcm = new TopologiaComboBoxModel(mc.getModels());
         jComboBox1.setModel(tcm);
         jFileChooser1.setMultiSelectionEnabled(true);
-        mc.createModel(new TopologiaTModel("Teste", 4, 10));
     }
 
     /**
@@ -233,7 +229,8 @@ public class MainView extends javax.swing.JFrame {
     private void jBTesteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTesteActionPerformed
         DefaultListModel dlm = new DefaultListModel();
         for(File t : testFiles){
-            dlm.add(dlm.size(), t.getName() + ": " + mc.classifyDocument(t, (TopologiaTModel) jComboBox1.getSelectedItem())*100 + "%");
+            ClassificationResult cr = mc.testAgainstAllModels(t);
+            dlm.add(dlm.size(), cr.getModelName() + ": " + cr.getPercentage() * 100 + "%");
         }
         jList1.setModel(dlm);
     }//GEN-LAST:event_jBTesteActionPerformed

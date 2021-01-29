@@ -3,12 +3,16 @@ package controller;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
+import javax.swing.JDialog;
 import model.ClassificationResult;
 import model.TopologiaTModel;
 import model.WordEntry;
@@ -30,10 +34,13 @@ public class MainController {
     ArrayList<TopologiaTModel> models;
     PDFTextStripper ocr;
     
-    
-
     public MainController() {
-        this.ocr = new PDFTextStripper();
+        try {
+            this.ocr = new PDFTextStripper();
+        } catch (IOException ex) {
+            System.err.println("Instantiation failure");
+            ex.printStackTrace();
+        }
         this.models = new ArrayList<>();
     }
     
@@ -46,7 +53,7 @@ public class MainController {
     }
     
     
-    public void trainModel(File[] fs, TopologiaTModel t, int similarityThreshold){
+    public void trainModel(File[] fs, TopologiaTModel t, int similarityThreshold) throws IOException{
         System.out.println(t.getName());
         for(File f : fs){
             PDDocument d = PDDocument.load(f);
@@ -63,7 +70,6 @@ public class MainController {
                         do{
                             if(!t.getTrainData().get(lineLoop).isEmpty()){
                                 WordEntry currentWordEntry = (WordEntry)t.getTrainData().get(lineLoop).get(i);
-                                System.out.println("Comparing " + word + " with " + currentWordEntry.getWord());
                                 if(EditDistanceRecursive.calculate(word, currentWordEntry.getWord()) < similarityThreshold){
                                     currentWordEntry.setOccurences(currentWordEntry.getOccurences()+1);
                                     add = false;
@@ -85,7 +91,7 @@ public class MainController {
         
     }
     
-    public float classifyDocument(File f, TopologiaTModel t){
+    public float classifyDocument(File f, TopologiaTModel t) throws IOException{
         PDDocument d = PDDocument.load(f);
         ArrayList<Float> results = new ArrayList<>(t.getSections());
         List<List> trainData = t.getTrainData();
@@ -98,33 +104,42 @@ public class MainController {
             HashSet<String> section = new HashSet<>();
             HashSet<String> dict = new HashSet<>();
             for(int currentLine = 0; currentLine < t.getLinesPerSection(); currentLine++){
-                section.addAll(Arrays.asList(lines[currentSection*t.getSections() + currentLine].split("[^\\p{L}\\p{Nd}]+")));
-                for(Object w: trainData.get(currentSection*t.getSections() + currentLine)){
-                    WordEntry we = (WordEntry)w;
-                    if(we.getOccurences()/t.getTrainCount() > 0.5){
-                        dict.add(we.getWord());
+                try{
+                    section.addAll(Arrays.asList(lines[currentSection*t.getLinesPerSection() + currentLine].split("[^\\p{L}\\p{Nd}]+")));
+                    for(Object w: trainData.get(currentSection*t.getLinesPerSection() + currentLine)){
+                        WordEntry we = (WordEntry)w;
+                        if(we.getOccurences()/t.getTrainCount() > 0.5){
+                            dict.add(we.getWord());
+                        }
                     }
+                }catch(ArrayIndexOutOfBoundsException ex){
+                    System.err.println("Line out of reach, skipping...");
+                    ex.printStackTrace();
                 }
             }
             int dictCount = dict.size();
-            dict.retainAll(section);
-            float result = dict.size()/(float) dictCount;
-            results.add(result);
+            float result;
+            if(dictCount != 0){
+                dict.retainAll(section);
+                result = dict.size()/(float) dictCount;
+                results.add(result);
+            }
         }
         
         for(Float flt : results){
             averageResult += flt;
         }
+        
         return averageResult / results.size();
     }
     
-    public ClassificationResult testAgainstAllModels(File f){
+    public ClassificationResult testAgainstAllModels(File f) throws IOException{
         TopologiaTModel highestModel = null;
         ClassificationResult res = new ClassificationResult();
         float highestPercentage = 0;
         for(TopologiaTModel t : models){
             float currentPercentage = classifyDocument(f, t);
-            if(currentPercentage > highestPercentage){
+            if(currentPercentage >= highestPercentage){
                 highestPercentage = currentPercentage;
                 highestModel = t;
             }

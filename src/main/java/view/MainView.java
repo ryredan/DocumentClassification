@@ -15,6 +15,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import model.ClassificationResult;
 import model.TopologiaComboBoxModel;
@@ -242,19 +243,22 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_jBAbrirTesteActionPerformed
 
     private void jBTreinarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTreinarActionPerformed
-        JDialog jd = new JDialog(this, "Treinando");
-        JPanel jp = new JPanel();
-        JLabel j1 = new JLabel("Aguarde...");
-        jd.add(jp);
-        jp.add(j1);
-        jd.setSize(100, 100);
-        jd.setVisible(true);
-        try {
-            mc.trainModel(trainFiles, (TopologiaTModel) jComboBox1.getSelectedItem(), 3);
-        } catch (IOException ex) {
-            System.err.println("Couldn't find file(s)!");
+        TopologiaTModel t = (TopologiaTModel) jComboBox1.getSelectedItem();
+        if (t != null){
+            JDialog jd = new JDialog(this, "Treinando");
+            JPanel jp = new JPanel();
+            JLabel j1 = new JLabel("Aguarde...");
+            jd.add(jp);
+            jp.add(j1);
+            jd.setSize(100, 100);
+            jd.setVisible(true);
+            try {
+                mc.trainModel(trainFiles, (TopologiaTModel) jComboBox1.getSelectedItem(), 3);
+            } catch (IOException ex) {
+                System.err.println("Couldn't find file(s)!");
+            }
+            jd.dispose();
         }
-        jd.dispose();
     }//GEN-LAST:event_jBTreinarActionPerformed
 
     private void jBTesteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTesteActionPerformed
